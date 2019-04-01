@@ -42,7 +42,7 @@ public class Inicio extends javax.swing.JFrame {
         int returnVal = fileChooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
-            malha = new Malha(file, this.qntdMaxVeiculo, this.intervaloInsercao, this.mecanismo, this.escolhaSaida);
+            malha = new MalhaTela(file, this.qntdMaxVeiculo, this.intervaloInsercao, this.mecanismo, this.escolhaSaida);
             malha.setVisible(true);
             this.dispose();
             // criar o tabuleiro e seus componentes
@@ -58,7 +58,7 @@ public class Inicio extends javax.swing.JFrame {
 
     }//GEN-LAST:event_jMenuItem1ActionPerformed
     private int qntdMaxVeiculo = 0, intervaloInsercao = 0, escolhaSaida, mecanismo;
-    private Malha malha;
+    private MalhaTela malha;
 
     /**
      * This method is called from within the constructor to initialize the form.

@@ -33,14 +33,14 @@ import javax.swing.table.DefaultTableCellRenderer;
  *
  * @author Jessica
  */
-public class Malha extends JFrame implements Observador {
+public class MalhaTela extends JFrame implements Observador {
     private Observado controller;
     private int linha, coluna;
     private JTable malhaRodoviaria;
     
    
     
-    public Malha(File file, int qtddMaxVeiculos, int IntervaloInsercao, int mecanismo, int saidaVeiculo){
+    public MalhaTela(File file, int qtddMaxVeiculos, int IntervaloInsercao, int mecanismo, int saidaVeiculo){
         this.controller = new Controller(qtddMaxVeiculos, IntervaloInsercao, mecanismo, saidaVeiculo);
         controller.addObservador(this);
         
@@ -147,7 +147,7 @@ public class Malha extends JFrame implements Observador {
         jp1.setLayout(new BorderLayout());
         
         malhaRodoviaria = new JTable();
-        malhaRodoviaria.setModel(new Malha.TableModelMalha());
+        malhaRodoviaria.setModel(new MalhaTela.TableModelMalha());
         for (int x = 0; x < malhaRodoviaria.getColumnModel().getColumnCount(); x++) {
             malhaRodoviaria.getColumnModel().getColumn(x).setWidth(28);
             malhaRodoviaria.getColumnModel().getColumn(x).setMinWidth(28);
@@ -157,7 +157,7 @@ public class Malha extends JFrame implements Observador {
         malhaRodoviaria.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         malhaRodoviaria.setShowGrid(false);
         malhaRodoviaria.setIntercellSpacing(new Dimension(0, 0));
-        malhaRodoviaria.setDefaultRenderer(Object.class, new Malha.MalhaRenderer());
+        malhaRodoviaria.setDefaultRenderer(Object.class, new MalhaTela.MalhaRenderer());
         jp1.add(malhaRodoviaria);
         add(jp1, BorderLayout.CENTER);
         

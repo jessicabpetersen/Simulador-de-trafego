@@ -14,11 +14,23 @@ import javax.swing.Icon;
 public abstract class Campo {
     private Icon imagem;
     boolean pontoInicial;
+    boolean carro;
 
     public Campo(Icon imagem) {
         this.imagem = imagem;
         pontoInicial = false;
+        carro = false;
     }
+
+    public boolean isCarro() {
+        return carro;
+    }
+
+    public void setCarro(boolean carro) {
+        this.carro = carro;
+    }
+    
+    
 
     public void setImagem(Icon imagem) {
         this.imagem = imagem;
@@ -37,4 +49,6 @@ public abstract class Campo {
     public void tornarPontoInicial(){
         this.pontoInicial = true;
     }
+    
+   
 }

@@ -5,7 +5,6 @@
  */
 package model;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 /**
@@ -22,5 +21,7 @@ public class RodEsquerda extends Rodovia{
     public boolean isGrama() {
         return false;
     }
+
+    
 
 }

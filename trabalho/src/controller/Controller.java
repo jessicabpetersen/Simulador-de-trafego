@@ -2,18 +2,19 @@ package controller;
 
 import java.io.File;
 import java.io.IOException;
+import static java.lang.Thread.sleep;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Icon;
 import model.Campo;
 import model.Carro;
 import model.Grama;
-import model.RodBaixo;
-import model.RodCima;
-import model.RodCruzamento;
-import model.RodDireita;
-import model.RodEsquerda;
+import model.Malha;
+import model.MalhaMonitor;
+import model.MalhaSemaforo;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -29,15 +30,15 @@ public class Controller implements Observado {
     private List<Observador> observadores = new ArrayList<>();
     private Campo[][] malhaRodoviaria;
     private Object fileChooser;
-    int linha, coluna, contagemPontosIniciais, qtddMaximaVeiculo, intervaloInsercao, mecanismo, saidaVeiculo;
+    int linha, coluna, saidaVeiculo, contagemPontosIniciais, qtddMaximaVeiculo, intervaloInsercao, mecanismo;
     private int[][] pontosIniciais;
-    
-    
-    public Controller(int qtddMaxVeiculos, int IntervaloInsercao, int mecanismo, int saidaVeiculo){
-        this.qtddMaximaVeiculo = qtddMaxVeiculos; 
-        if(IntervaloInsercao > 0){
+    private Malha malha;
+
+    public Controller(int qtddMaxVeiculos, int IntervaloInsercao, int mecanismo, int saidaVeiculo) {
+        this.qtddMaximaVeiculo = qtddMaxVeiculos;
+        if (IntervaloInsercao > 0) {
             this.intervaloInsercao = IntervaloInsercao;
-        }else{
+        } else {
             this.intervaloInsercao = 5000;
         }
         //Mecanismo 1: encerrar e aguardar veículos saírem da malha   2: para de inserir e encerra imediatamente todos os veículos   
@@ -45,11 +46,25 @@ public class Controller implements Observado {
         //SaidaVeiculo: 1: Semáforo  2:Monitor
         this.saidaVeiculo = saidaVeiculo;
     }
-    
-    public void criarVeiculo(){
-        for (int i = 0; i < qtddMaximaVeiculo; i++) {
-            Carro carro = new Carro();
+
+    @Override
+    public void criarVeiculo() {
+        while (qtddMaximaVeiculo > 0) {
+            Carro carro = new Carro(malha);
+            qtddMaximaVeiculo--;
+            carro.start();
+            try {
+                sleep(intervaloInsercao);
+                notificarMovimento();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+        criarVeiculo();
+    }
+
+    public void terminarCarro() {
+        qtddMaximaVeiculo++;
     }
 
     @Override
@@ -67,46 +82,33 @@ public class Controller implements Observado {
 
     public void montarMalha(File file) {
         try {
-            contagemPontosIniciais = 0;
             // What to do with the file, e.g. display it in a TextArea
             Scanner scanA = new Scanner(file);
             linha = scanA.nextInt();
             coluna = scanA.nextInt();
-            passarTamanho();
             System.out.println("lin: " + linha + " col: " + coluna);
             malhaRodoviaria = new Campo[linha][coluna];
-            carregaMalha();
+           
+            if (saidaVeiculo == 1) {
+                malha = new MalhaSemaforo(malhaRodoviaria, contagemPontosIniciais);
+            } else {
+                malha = new MalhaMonitor(malhaRodoviaria, contagemPontosIniciais);
+            }
+            passarTamanho();
+            malha.carregaMalha(coluna, linha);
             while (scanA.hasNext()) {
-                carrega(scanA);
+                malha.carrega(scanA);
 
             }
-            pontosIniciais = new int[2][contagemPontosIniciais];
-            int linhaMatrizPontos = 0;
-            int colunaMatrizPontos = 0;
-            for (int i = 0; i < linha; i++) {
-                for (int j = 0; j < coluna; j++) {
-                    if (malhaRodoviaria[j][i].isPontoInicial()) {
-                        pontosIniciais[colunaMatrizPontos][linhaMatrizPontos] = j;
-                        colunaMatrizPontos++;
-                        pontosIniciais[colunaMatrizPontos][linhaMatrizPontos] = i;
-                        colunaMatrizPontos = 0;
-                        linhaMatrizPontos++;
-                    }
-                }
-            }
-//
-//            String colunmNames[] = new String[coluna];
-//            for (int i = 0; i < colunmNames.length; i++) {
-//                colunmNames[i] = String.valueOf(i);
-//
-//            }
-//
-//            runTable(A, colunmNames);
+            malha.pontosIniciais();
+            contagemPontosIniciais = malha.getContagemPontosIniciais();
             scanA.close();
         } catch (IOException ex) {
             System.out.println("problem accessing file" + file.getAbsolutePath());
         }
     }
+
+    
 
     public void notificarMovimento() {
         for (Observador observador : observadores) {
@@ -124,68 +126,7 @@ public class Controller implements Observado {
         }
     }
 
-    public boolean cruzamento(int linha, int coluna) {
-        if (!malhaRodoviaria[coluna][linha].isGrama()) {
-            malhaRodoviaria[coluna][linha] = new RodCruzamento();
-            return true;
-        } else {
-            return false;
-        }
-    }
+    
 
-    public void carrega(Scanner scanX) {
-        int colunaInicial = scanX.nextInt();
-        int linhaInicial = scanX.nextInt();
-        int colunaFinal = scanX.nextInt();
-        int linhaFinal = scanX.nextInt();
-
-        // verifica se ta indo horizontalmente ou verticalmente
-        if (linhaInicial == linhaFinal) {  //horizontalmente
-            //direita ou esquerda
-            if (colunaInicial < colunaFinal) { //direita
-                for (int i = colunaInicial; i <= colunaFinal; i++) {
-                    if (!cruzamento(linhaInicial, i)) {
-                        malhaRodoviaria[i][linhaInicial] = new RodDireita();
-                    }
-                }
-                if (colunaInicial == 0) {
-                    contagemPontosIniciais++;
-                    malhaRodoviaria[colunaInicial][linhaInicial].tornarPontoInicial();
-                }
-            } else {//esquerda
-                for (int i = colunaInicial; i >= colunaFinal; i--) {
-                    if (!cruzamento(linhaInicial, i)) {
-                        malhaRodoviaria[i][linhaInicial] = new RodEsquerda();
-                    }
-                }
-                if (colunaInicial == (coluna - 1)) {
-                    contagemPontosIniciais++;
-                    malhaRodoviaria[colunaInicial][linhaInicial].tornarPontoInicial();
-                }
-            }
-        } else { //verticalmente
-            if (linhaInicial < linhaFinal) { //baixo
-                for (int i = linhaInicial; i <= linhaFinal; i++) {
-                    if (!cruzamento(i, colunaInicial)) {
-                        malhaRodoviaria[colunaFinal][i] = new RodBaixo();
-
-                    }
-                }
-                if (linhaInicial == 0) {
-                    contagemPontosIniciais++;
-                    malhaRodoviaria[colunaInicial][linhaInicial].tornarPontoInicial();
-                }
-            } else {// cima
-                for (int i = linhaInicial; i >= linhaFinal; i--) {
-                    if (!cruzamento(i, colunaInicial)) {
-                        malhaRodoviaria[colunaFinal][i] = new RodCima();
-                    }
-                }
-                if (linhaInicial == (linha - 1)) {
-                    contagemPontosIniciais++;
-                    malhaRodoviaria[colunaInicial][linhaInicial].tornarPontoInicial();
-                }
-            }
-        }
-    }
+    
 }

@@ -23,5 +23,7 @@ public class Grama extends Campo {
     public boolean isGrama() {
         return true;
     }
+
+   
     
 }
