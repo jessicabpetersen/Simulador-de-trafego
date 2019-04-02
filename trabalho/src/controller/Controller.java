@@ -13,8 +13,6 @@ import model.Campo;
 import model.Carro;
 import model.Grama;
 import model.Malha;
-import model.MalhaMonitor;
-import model.MalhaSemaforo;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -50,7 +48,7 @@ public class Controller implements Observado {
     @Override
     public void criarVeiculo() {
         while (qtddMaximaVeiculo > 0) {
-            Carro carro = new Carro(malha);
+            Carro carro = new Carro(malha, this);
             qtddMaximaVeiculo--;
             carro.start();
             try {
@@ -88,18 +86,15 @@ public class Controller implements Observado {
             coluna = scanA.nextInt();
             System.out.println("lin: " + linha + " col: " + coluna);
             malhaRodoviaria = new Campo[linha][coluna];
-           
-            if (saidaVeiculo == 1) {
-                malha = new MalhaSemaforo(malhaRodoviaria, contagemPontosIniciais);
-            } else {
-                malha = new MalhaMonitor(malhaRodoviaria, contagemPontosIniciais);
-            }
+
+            malha = new Malha(malhaRodoviaria, contagemPontosIniciais, saidaVeiculo);
+
             passarTamanho();
             malha.carregaMalha(coluna, linha);
             while (scanA.hasNext()) {
                 malha.carrega(scanA);
-
             }
+            
             malha.pontosIniciais();
             contagemPontosIniciais = malha.getContagemPontosIniciais();
             scanA.close();
@@ -107,8 +102,6 @@ public class Controller implements Observado {
             System.out.println("problem accessing file" + file.getAbsolutePath());
         }
     }
-
-    
 
     public void notificarMovimento() {
         for (Observador observador : observadores) {
@@ -126,7 +119,4 @@ public class Controller implements Observado {
         }
     }
 
-    
-
-    
 }

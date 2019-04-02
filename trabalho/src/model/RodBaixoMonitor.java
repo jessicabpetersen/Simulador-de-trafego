@@ -12,20 +12,19 @@ import javax.swing.ImageIcon;
  *
  * @author Jessica
  */
-public class Grama extends Campo {
-    
-    
-    public Grama() {
-        super(new ImageIcon("img/grama.png"));
+public class RodBaixoMonitor extends Rodovia{
+
+    public RodBaixoMonitor() {
+        super(new ImageIcon("img/rodoviaBaixo.png"));
     }
 
     @Override
     public boolean isGrama() {
-        return true;
+        return false;
     }
 
     @Override
-    void colocarCarro() throws InterruptedException {
+    void  colocarCarro() throws InterruptedException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -41,19 +40,19 @@ public class Grama extends Campo {
 //
 //    @Override
 //    boolean isEsquerda() {
-//        return false;
+//       return false;
 //    }
 //
 //    @Override
 //    boolean isBaixo() {
-//        return false;
+//        return true;
 //    }
 //
 //    @Override
 //    boolean isCima() {
 //        return false;
 //    }
+//
+//    
 
-   
-    
 }

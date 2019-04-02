@@ -22,5 +22,35 @@ public class RodCruzamento extends Rodovia{
         return false;
     }
 
+    @Override
+    void colocarCarro() throws InterruptedException {
+        
+    }
+
+    @Override
+    void retirarCarro() {
+        
+    }
+
+//    @Override
+//    boolean isDireita() {
+//        return false;
+//    }
+//
+//    @Override
+//    boolean isEsquerda() {
+//        return false;
+//    }
+//
+//    @Override
+//    boolean isBaixo() {
+//       return false;
+//    }
+//
+//    @Override
+//    boolean isCima() {
+//        return false;
+//    }
+
    
 }

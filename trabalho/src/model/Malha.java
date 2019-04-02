@@ -5,30 +5,33 @@
  */
 package model;
 
+import java.util.Random;
 import java.util.Scanner;
 
 /**
  *
  * @author Jessica
  */
-public abstract class Malha {
+public class Malha {
     
-    private Campo[][] malhaRodoviaria;
-    private int[][] pontosIniciais;
-    private int contagemPontosIniciais, coluna, linha;
+    protected Campo[][] malhaRodoviaria;
+    protected int[][] pontosIniciais;
+    protected int contagemPontosIniciais, colunasTotais, linhasTotais, saidaVeiculo;
+    protected Random rand = new Random();
 
     public int getContagemPontosIniciais() {
         return contagemPontosIniciais;
     }
     
-    public Malha(Campo[][] malha, int contagemPontosIniciais){
+    public Malha(Campo[][] malha, int contagemPontosIniciais, int saidaVeiculo){
         this.malhaRodoviaria = malha;
         this.contagemPontosIniciais = contagemPontosIniciais;
+        this.saidaVeiculo = saidaVeiculo;
     }
     
     public void carregaMalha(int coluna, int linha) {
-        this.coluna = coluna;
-        this.linha = linha;
+        this.colunasTotais = coluna;
+        this.linhasTotais = linha;
         for (int i = 0; i < coluna; i++) {
             for (int j = 0; j < linha; j++) {
                 this.malhaRodoviaria[i][j] = new Grama();
@@ -41,14 +44,24 @@ public abstract class Malha {
         int linhaInicial = scanX.nextInt();
         int colunaFinal = scanX.nextInt();
         int linhaFinal = scanX.nextInt();
+        if(saidaVeiculo == 1){
+            carregarSemafoto(colunaInicial, linhaInicial, colunaFinal, linhaFinal);
+        }else{
+            carregaMonitor(colunaInicial, linhaInicial, colunaFinal, linhaFinal);
+        }
 
-        // verifica se ta indo horizontalmente ou verticalmente
+       
+        
+    }
+    
+    public void carregarSemafoto(int colunaInicial, int linhaInicial, int colunaFinal, int linhaFinal){
+         // verifica se ta indo horizontalmente ou verticalmente
         if (linhaInicial == linhaFinal) {  //horizontalmente
             //direita ou esquerda
             if (colunaInicial < colunaFinal) { //direita
                 for (int i = colunaInicial; i <= colunaFinal; i++) {
                     if (!cruzamento(linhaInicial, i)) {
-                        malhaRodoviaria[i][linhaInicial] = new RodDireita();
+                        malhaRodoviaria[i][linhaInicial] = new RodDireitaSemaforo();
                     }
                 }
                 if (colunaInicial == 0) {
@@ -58,10 +71,10 @@ public abstract class Malha {
             } else {//esquerda
                 for (int i = colunaInicial; i >= colunaFinal; i--) {
                     if (!cruzamento(linhaInicial, i)) {
-                        malhaRodoviaria[i][linhaInicial] = new RodEsquerda();
+                        malhaRodoviaria[i][linhaInicial] = new RodEsquerdaSemaforo();
                     }
                 }
-                if (colunaInicial == (coluna - 1)) {
+                if (colunaInicial == (colunasTotais - 1)) {
                     contagemPontosIniciais++;
                     malhaRodoviaria[colunaInicial][linhaInicial].tornarPontoInicial();
                 }
@@ -70,7 +83,7 @@ public abstract class Malha {
             if (linhaInicial < linhaFinal) { //baixo
                 for (int i = linhaInicial; i <= linhaFinal; i++) {
                     if (!cruzamento(i, colunaInicial)) {
-                        malhaRodoviaria[colunaFinal][i] = new RodBaixo();
+                        malhaRodoviaria[colunaFinal][i] = new RodBaixoSemaforo();
 
                     }
                 }
@@ -81,16 +94,66 @@ public abstract class Malha {
             } else {// cima
                 for (int i = linhaInicial; i >= linhaFinal; i--) {
                     if (!cruzamento(i, colunaInicial)) {
-                        malhaRodoviaria[colunaFinal][i] = new RodCima();
+                        malhaRodoviaria[colunaFinal][i] = new RodCimaSemaforo();
                     }
                 }
-                if (linhaInicial == (linha - 1)) {
+                if (linhaInicial == (linhasTotais - 1)) {
                     contagemPontosIniciais++;
                     malhaRodoviaria[colunaInicial][linhaInicial].tornarPontoInicial();
                 }
             }
         }
-        
+    }
+    
+    public void carregaMonitor(int colunaInicial, int linhaInicial, int colunaFinal, int linhaFinal){
+         // verifica se ta indo horizontalmente ou verticalmente
+        if (linhaInicial == linhaFinal) {  //horizontalmente
+            //direita ou esquerda
+            if (colunaInicial < colunaFinal) { //direita
+                for (int i = colunaInicial; i <= colunaFinal; i++) {
+                    if (!cruzamento(linhaInicial, i)) {
+                        malhaRodoviaria[i][linhaInicial] = new RodDireitaMonitor();
+                    }
+                }
+                if (colunaInicial == 0) {
+                    contagemPontosIniciais++;
+                    malhaRodoviaria[colunaInicial][linhaInicial].tornarPontoInicial();
+                }
+            } else {//esquerda
+                for (int i = colunaInicial; i >= colunaFinal; i--) {
+                    if (!cruzamento(linhaInicial, i)) {
+                        malhaRodoviaria[i][linhaInicial] = new RodEsquerdaMonitor();
+                    }
+                }
+                if (colunaInicial == (colunasTotais - 1)) {
+                    contagemPontosIniciais++;
+                    malhaRodoviaria[colunaInicial][linhaInicial].tornarPontoInicial();
+                }
+            }
+        } else { //verticalmente
+            if (linhaInicial < linhaFinal) { //baixo
+                for (int i = linhaInicial; i <= linhaFinal; i++) {
+                    if (!cruzamento(i, colunaInicial)) {
+                        malhaRodoviaria[colunaFinal][i] = new RodBaixoMonitor();
+
+                    }
+                }
+                if (linhaInicial == 0) {
+                    contagemPontosIniciais++;
+                    malhaRodoviaria[colunaInicial][linhaInicial].tornarPontoInicial();
+                }
+            } else {// cima
+                for (int i = linhaInicial; i >= linhaFinal; i--) {
+                    if (!cruzamento(i, colunaInicial)) {
+                        malhaRodoviaria[colunaFinal][i] = new RodCimaMonitor();
+                    }
+                }
+                if (linhaInicial == (linhasTotais - 1)) {
+                    contagemPontosIniciais++;
+                    malhaRodoviaria[colunaInicial][linhaInicial].tornarPontoInicial();
+                }
+            }
+        }
     }
     
     public boolean cruzamento(int linha, int coluna) {
@@ -106,8 +169,8 @@ public abstract class Malha {
         pontosIniciais = new int[2][contagemPontosIniciais];
             int linhaMatrizPontos = 0;
             int colunaMatrizPontos = 0;
-            for (int i = 0; i < linha; i++) {
-                for (int j = 0; j < coluna; j++) {
+            for (int i = 0; i < linhasTotais; i++) {
+                for (int j = 0; j < colunasTotais; j++) {
                     if (malhaRodoviaria[j][i].isPontoInicial()) {
                         this.pontosIniciais[colunaMatrizPontos][linhaMatrizPontos] = j;
                         colunaMatrizPontos++;
@@ -119,75 +182,76 @@ public abstract class Malha {
             }
             retirarCruzamentosFalsos();
     }
+    
     public void retirarCruzamentosFalsos() {
-        for (int i = 0; i < linha; i++) {
-            for (int j = 0; j < coluna; j++) {
+        for (int i = 0; i < linhasTotais; i++) {
+            for (int j = 0; j < colunasTotais; j++) {
                 if (malhaRodoviaria[j][i].getClass() == RodCruzamento.class) {
-                    if (malhaRodoviaria[(j - 1)][i].getClass() == RodDireita.class) {
+                    if (malhaRodoviaria[(j - 1)][i].getClass() == RodDireitaSemaforo.class) {
 
-                        if (!((malhaRodoviaria[j][(i - 1)].getClass() == RodCima.class) && ((malhaRodoviaria[(j + 1)][i].getClass() == RodDireita.class) || malhaRodoviaria[j][(i + 1)].getClass() == RodBaixo.class))
-                                && !((malhaRodoviaria[(j + 1)][i].getClass() == RodDireita.class) && ((malhaRodoviaria[j][(i - 1)].getClass() == RodCima.class) || (malhaRodoviaria[j][(i + 1)].getClass() == RodBaixo.class)))
-                                && !((malhaRodoviaria[j][(i + 1)].getClass() == RodBaixo.class) && ((malhaRodoviaria[(j + 1)][i].getClass() == RodDireita.class) || (malhaRodoviaria[j][(i - 1)].getClass() == RodCima.class)))) {
+                        if (!((malhaRodoviaria[j][(i - 1)].getClass() == RodCimaSemaforo.class) && ((malhaRodoviaria[(j + 1)][i].getClass() == RodDireitaSemaforo.class) || malhaRodoviaria[j][(i + 1)].getClass() == RodBaixoSemaforo.class))
+                                && !((malhaRodoviaria[(j + 1)][i].getClass() == RodDireitaSemaforo.class) && ((malhaRodoviaria[j][(i - 1)].getClass() == RodCimaSemaforo.class) || (malhaRodoviaria[j][(i + 1)].getClass() == RodBaixoSemaforo.class)))
+                                && !((malhaRodoviaria[j][(i + 1)].getClass() == RodBaixoSemaforo.class) && ((malhaRodoviaria[(j + 1)][i].getClass() == RodDireitaSemaforo.class) || (malhaRodoviaria[j][(i - 1)].getClass() == RodCimaSemaforo.class)))) {
 
-                            if (malhaRodoviaria[j][(i - 1)].getClass() == RodCima.class) {
-                                malhaRodoviaria[j][i] = new RodCima();
+                            if (malhaRodoviaria[j][(i - 1)].getClass() == RodCimaSemaforo.class) {
+                                malhaRodoviaria[j][i] = new RodCimaSemaforo();
                             } else {
-                                if (malhaRodoviaria[(j + 1)][i].getClass() == RodDireita.class) {
-                                    malhaRodoviaria[j][i] = new RodDireita();
+                                if (malhaRodoviaria[(j + 1)][i].getClass() == RodDireitaSemaforo.class) {
+                                    malhaRodoviaria[j][i] = new RodDireitaSemaforo();
                                 } else {
-                                    malhaRodoviaria[j][i] = new RodBaixo();
+                                    malhaRodoviaria[j][i] = new RodBaixoSemaforo();
                                 }
                             }
                         }
                     } else {
-                        if (malhaRodoviaria[(j + 1)][i].getClass() == RodEsquerda.class) {
+                        if (malhaRodoviaria[(j + 1)][i].getClass() == RodEsquerdaSemaforo.class) {
 
-                            if (!((malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerda.class) && ((malhaRodoviaria[j][(i - 1)].getClass() == RodCima.class) || (malhaRodoviaria[j][(i + 1)].getClass() == RodBaixo.class)))
-                                    && !((malhaRodoviaria[j][(i - 1)].getClass() == RodCima.class) && ((malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerda.class) || (malhaRodoviaria[j][(i + 1)].getClass() == RodBaixo.class)))
-                                    && !((malhaRodoviaria[j][(i + 1)].getClass() == RodBaixo.class) && ((malhaRodoviaria[j][(i - 1)].getClass() == RodCima.class) || (malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerda.class)))) {
+                            if (!((malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerdaSemaforo.class) && ((malhaRodoviaria[j][(i - 1)].getClass() == RodCimaSemaforo.class) || (malhaRodoviaria[j][(i + 1)].getClass() == RodBaixoSemaforo.class)))
+                                    && !((malhaRodoviaria[j][(i - 1)].getClass() == RodCimaSemaforo.class) && ((malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerdaSemaforo.class) || (malhaRodoviaria[j][(i + 1)].getClass() == RodBaixoSemaforo.class)))
+                                    && !((malhaRodoviaria[j][(i + 1)].getClass() == RodBaixoSemaforo.class) && ((malhaRodoviaria[j][(i - 1)].getClass() == RodCimaSemaforo.class) || (malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerdaSemaforo.class)))) {
 
-                                if (malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerda.class) {
-                                    malhaRodoviaria[j][i] = new RodEsquerda();
+                                if (malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerdaSemaforo.class) {
+                                    malhaRodoviaria[j][i] = new RodEsquerdaSemaforo();
                                 } else {
-                                    if (malhaRodoviaria[j][(i - 1)].getClass() == RodCima.class) {
-                                        malhaRodoviaria[j][i] = new RodCima();
+                                    if (malhaRodoviaria[j][(i - 1)].getClass() == RodCimaSemaforo.class) {
+                                        malhaRodoviaria[j][i] = new RodCimaSemaforo();
                                     } else {
-                                        malhaRodoviaria[j][i] = new RodBaixo();
+                                        malhaRodoviaria[j][i] = new RodBaixoSemaforo();
                                     }
                                 }
                             }
                         } else {
-                            if (malhaRodoviaria[j][(i - 1)].getClass() == RodBaixo.class) {
+                            if (malhaRodoviaria[j][(i - 1)].getClass() == RodBaixoSemaforo.class) {
 
-                                if (!((malhaRodoviaria[(j + 1)][i].getClass() == RodDireita.class) && ((malhaRodoviaria[j][(i + 1)].getClass() == RodBaixo.class) || (malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerda.class)))
-                                        && !((malhaRodoviaria[j][(i + 1)].getClass() == RodBaixo.class) && ((malhaRodoviaria[(j + 1)][i].getClass() == RodDireita.class) || (malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerda.class)))
-                                        && !((malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerda.class) && ((malhaRodoviaria[j][(i + 1)].getClass() == RodBaixo.class) || (malhaRodoviaria[(j + 1)][i].getClass() == RodDireita.class)))) {
+                                if (!((malhaRodoviaria[(j + 1)][i].getClass() == RodDireitaSemaforo.class) && ((malhaRodoviaria[j][(i + 1)].getClass() == RodBaixoSemaforo.class) || (malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerdaSemaforo.class)))
+                                        && !((malhaRodoviaria[j][(i + 1)].getClass() == RodBaixoSemaforo.class) && ((malhaRodoviaria[(j + 1)][i].getClass() == RodDireitaSemaforo.class) || (malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerdaSemaforo.class)))
+                                        && !((malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerdaSemaforo.class) && ((malhaRodoviaria[j][(i + 1)].getClass() == RodBaixoSemaforo.class) || (malhaRodoviaria[(j + 1)][i].getClass() == RodDireitaSemaforo.class)))) {
 
-                                    if (malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerda.class) {
-                                        malhaRodoviaria[j][i] = new RodEsquerda();
+                                    if (malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerdaSemaforo.class) {
+                                        malhaRodoviaria[j][i] = new RodEsquerdaSemaforo();
                                     } else {
-                                        if (malhaRodoviaria[(j + 1)][i].getClass() == RodDireita.class) {
-                                            malhaRodoviaria[j][i] = new RodDireita();
+                                        if (malhaRodoviaria[(j + 1)][i].getClass() == RodDireitaSemaforo.class) {
+                                            malhaRodoviaria[j][i] = new RodDireitaSemaforo();
 
                                         } else {
-                                            malhaRodoviaria[j][i] = new RodBaixo();
+                                            malhaRodoviaria[j][i] = new RodBaixoSemaforo();
                                         }
                                     }
 
                                 }
                             } else {
-                                if (malhaRodoviaria[j][(i + 1)].getClass() == RodCima.class) {
-                                    if (!((malhaRodoviaria[j][(i - 1)].getClass() == RodCima.class) && ((malhaRodoviaria[(j + 1)][i].getClass() == RodDireita.class) || (malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerda.class)))
-                                            && !((malhaRodoviaria[(j + 1)][i].getClass() == RodDireita.class) && ((malhaRodoviaria[j][(i - 1)].getClass() == RodCima.class) || (malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerda.class)))
-                                            && !((malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerda.class) && ((malhaRodoviaria[(j + 1)][i].getClass() == RodDireita.class) || (malhaRodoviaria[j][(i - 1)].getClass() == RodCima.class)))) {
+                                if (malhaRodoviaria[j][(i + 1)].getClass() == RodCimaSemaforo.class) {
+                                    if (!((malhaRodoviaria[j][(i - 1)].getClass() == RodCimaSemaforo.class) && ((malhaRodoviaria[(j + 1)][i].getClass() == RodDireitaSemaforo.class) || (malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerdaSemaforo.class)))
+                                            && !((malhaRodoviaria[(j + 1)][i].getClass() == RodDireitaSemaforo.class) && ((malhaRodoviaria[j][(i - 1)].getClass() == RodCimaSemaforo.class) || (malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerdaSemaforo.class)))
+                                            && !((malhaRodoviaria[(j - 1)][i].getClass() == RodEsquerdaSemaforo.class) && ((malhaRodoviaria[(j + 1)][i].getClass() == RodDireitaSemaforo.class) || (malhaRodoviaria[j][(i - 1)].getClass() == RodCimaSemaforo.class)))) {
 
-                                        if (malhaRodoviaria[j][(i - 1)].getClass() == RodCima.class) {
-                                            malhaRodoviaria[j][i] = new RodCima();
+                                        if (malhaRodoviaria[j][(i - 1)].getClass() == RodCimaSemaforo.class) {
+                                            malhaRodoviaria[j][i] = new RodCimaSemaforo();
                                         } else {
-                                            if (malhaRodoviaria[(j + 1)][i].getClass() == RodDireita.class) {
-                                                malhaRodoviaria[j][i] = new RodDireita();
+                                            if (malhaRodoviaria[(j + 1)][i].getClass() == RodDireitaSemaforo.class) {
+                                                malhaRodoviaria[j][i] = new RodDireitaSemaforo();
                                             } else {
-                                                malhaRodoviaria[j][i] = new RodEsquerda();
+                                                malhaRodoviaria[j][i] = new RodEsquerdaSemaforo();
                                             }
                                         }
                                     }
@@ -199,6 +263,23 @@ public abstract class Malha {
             }
         }
     }
+
+    public Campo[][] getMalhaRodoviaria() {
+        return malhaRodoviaria;
+    }
+
+    public int[][] getPontosIniciais() {
+        return pontosIniciais;
+    }
+
+    public int getColunasTotais() {
+        return colunasTotais;
+    }
+
+    public int getLinhasTotais() {
+        return linhasTotais;
+    }
     
-    abstract void andar();
+    
+    
 }

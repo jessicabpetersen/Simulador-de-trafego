@@ -50,5 +50,17 @@ public abstract class Campo {
         this.pontoInicial = true;
     }
     
+    abstract void colocarCarro() throws InterruptedException;
+    
+    abstract void retirarCarro();
+    
+//    abstract boolean isDireita();
+//    
+//    abstract boolean isEsquerda();
+//    
+//    abstract boolean isBaixo();
+//    
+//    abstract boolean isCima();
+    
    
 }

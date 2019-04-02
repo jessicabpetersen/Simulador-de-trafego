@@ -12,16 +12,14 @@ import javax.swing.ImageIcon;
  *
  * @author Jessica
  */
-public class Grama extends Campo {
-    
-    
-    public Grama() {
-        super(new ImageIcon("img/grama.png"));
-    }
+public class RodCimaMonitor extends Rodovia{
 
+    public RodCimaMonitor() {
+        super(new ImageIcon("img/rodoviaCima.png"));
+    }
     @Override
     public boolean isGrama() {
-        return true;
+        return false;
     }
 
     @Override
@@ -51,9 +49,9 @@ public class Grama extends Campo {
 //
 //    @Override
 //    boolean isCima() {
-//        return false;
+//        return true;
 //    }
 
-   
+    
     
 }

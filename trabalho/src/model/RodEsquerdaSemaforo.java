@@ -5,33 +5,36 @@
  */
 package model;
 
-import javax.swing.Icon;
+import java.util.concurrent.Semaphore;
 import javax.swing.ImageIcon;
 
 /**
  *
  * @author Jessica
  */
-public class Grama extends Campo {
+public class RodEsquerdaSemaforo extends Rodovia{
     
-    
-    public Grama() {
-        super(new ImageIcon("img/grama.png"));
-    }
+    private Semaphore mutex = new Semaphore(1);
 
+    public RodEsquerdaSemaforo() {
+        super(new ImageIcon("img/rodoviaEsquerda.png"));
+    }
+    
     @Override
     public boolean isGrama() {
-        return true;
+        return false;
     }
-
+    
     @Override
-    void colocarCarro() throws InterruptedException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void colocarCarro() throws InterruptedException{
+        mutex.acquire();
+        setImagem(new ImageIcon("img/carroesquerda.png"));
     }
-
+    
     @Override
-    void retirarCarro() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void retirarCarro(){
+        setImagem(new ImageIcon("img/rodoviaEsquerda.png"));
+        mutex.release();
     }
 
 //    @Override
@@ -41,7 +44,7 @@ public class Grama extends Campo {
 //
 //    @Override
 //    boolean isEsquerda() {
-//        return false;
+//        return true;
 //    }
 //
 //    @Override
@@ -54,6 +57,4 @@ public class Grama extends Campo {
 //        return false;
 //    }
 
-   
-    
 }

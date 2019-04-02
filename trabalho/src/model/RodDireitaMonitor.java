@@ -5,23 +5,22 @@
  */
 package model;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 /**
  *
  * @author Jessica
  */
-public class Grama extends Campo {
-    
-    
-    public Grama() {
-        super(new ImageIcon("img/grama.png"));
+public class RodDireitaMonitor extends Rodovia{
+//    public boolean pontoInicial;
+    public RodDireitaMonitor() {
+        super(new ImageIcon("img/rodoviaDireita.png"));
+        pontoInicial = false;
     }
-
+    
     @Override
     public boolean isGrama() {
-        return true;
+        return false;
     }
 
     @Override
@@ -36,7 +35,7 @@ public class Grama extends Campo {
 
 //    @Override
 //    boolean isDireita() {
-//        return false;
+//        return true;
 //    }
 //
 //    @Override
@@ -55,5 +54,5 @@ public class Grama extends Campo {
 //    }
 
    
-    
+
 }

@@ -5,6 +5,7 @@
  */
 package model;
 
+import java.util.concurrent.Semaphore;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
@@ -12,26 +13,28 @@ import javax.swing.ImageIcon;
  *
  * @author Jessica
  */
-public class Grama extends Campo {
+public class RodBaixoSemaforo extends Rodovia{
+
+    private Semaphore mutex = new Semaphore(1);
     
-    
-    public Grama() {
-        super(new ImageIcon("img/grama.png"));
+    public RodBaixoSemaforo() {
+        super(new ImageIcon("img/rodoviaBaixo.png"));
     }
 
     @Override
     public boolean isGrama() {
-        return true;
+        return false;
     }
-
-    @Override
+     @Override
     void colocarCarro() throws InterruptedException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        mutex.acquire();
+        setImagem(new ImageIcon("img/carrobaixo.png"));
     }
 
     @Override
     void retirarCarro() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        setImagem(new ImageIcon("img/rodoviaBaixo.png"));
+        mutex.release();
     }
 
 //    @Override
@@ -46,14 +49,11 @@ public class Grama extends Campo {
 //
 //    @Override
 //    boolean isBaixo() {
-//        return false;
+//        return true;
 //    }
 //
 //    @Override
 //    boolean isCima() {
 //        return false;
 //    }
-
-   
-    
 }
