@@ -28,6 +28,7 @@ public class RodBaixoSemaforo extends Rodovia{
      @Override
     void colocarCarro() throws InterruptedException {
         mutex.acquire();
+        System.out.println("andou para baixo");
         setImagem(new ImageIcon("img/carrobaixo.png"));
     }
 
@@ -37,23 +38,5 @@ public class RodBaixoSemaforo extends Rodovia{
         mutex.release();
     }
 
-//    @Override
-//    boolean isDireita() {
-//        return false;
-//    }
-//
-//    @Override
-//    boolean isEsquerda() {
-//        return false;
-//    }
-//
-//    @Override
-//    boolean isBaixo() {
-//        return true;
-//    }
-//
-//    @Override
-//    boolean isCima() {
-//        return false;
-//    }
+
 }

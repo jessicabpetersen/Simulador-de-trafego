@@ -68,6 +68,9 @@ public class Malha {
                     contagemPontosIniciais++;
                     malhaRodoviaria[colunaInicial][linhaInicial].tornarPontoInicial();
                 }
+                if(colunaFinal == (colunasTotais-1)){
+                    malhaRodoviaria[colunaFinal][linhaFinal].tornarPontoFinal();
+                }
             } else {//esquerda
                 for (int i = colunaInicial; i >= colunaFinal; i--) {
                     if (!cruzamento(linhaInicial, i)) {
@@ -77,6 +80,9 @@ public class Malha {
                 if (colunaInicial == (colunasTotais - 1)) {
                     contagemPontosIniciais++;
                     malhaRodoviaria[colunaInicial][linhaInicial].tornarPontoInicial();
+                }
+                if(colunaFinal == 0){
+                    malhaRodoviaria[colunaFinal][linhaFinal].tornarPontoFinal();
                 }
             }
         } else { //verticalmente
@@ -91,6 +97,9 @@ public class Malha {
                     contagemPontosIniciais++;
                     malhaRodoviaria[colunaInicial][linhaInicial].tornarPontoInicial();
                 }
+                if(linhaFinal == (linhasTotais -1)){
+                    malhaRodoviaria[colunaFinal][linhaFinal].tornarPontoFinal();
+                }
             } else {// cima
                 for (int i = linhaInicial; i >= linhaFinal; i--) {
                     if (!cruzamento(i, colunaInicial)) {
@@ -100,6 +109,9 @@ public class Malha {
                 if (linhaInicial == (linhasTotais - 1)) {
                     contagemPontosIniciais++;
                     malhaRodoviaria[colunaInicial][linhaInicial].tornarPontoInicial();
+                }
+                if(linhaFinal == 0){
+                    malhaRodoviaria[colunaFinal][linhaFinal].tornarPontoFinal();
                 }
             }
         }

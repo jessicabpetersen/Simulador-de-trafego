@@ -13,12 +13,13 @@ import javax.swing.Icon;
  */
 public abstract class Campo {
     private Icon imagem;
-    boolean pontoInicial;
+    boolean pontoInicial, pontoFinal;
     boolean carro;
 
     public Campo(Icon imagem) {
         this.imagem = imagem;
         pontoInicial = false;
+        pontoFinal = false;
         carro = false;
     }
 
@@ -46,8 +47,16 @@ public abstract class Campo {
         return pontoInicial;
     }
     
+    public boolean isPontoFinal(){
+        return pontoFinal;
+    }
+    
     public void tornarPontoInicial(){
         this.pontoInicial = true;
+    }
+    
+    public void tornarPontoFinal(){
+        this.pontoFinal = true;
     }
     
     abstract void colocarCarro() throws InterruptedException;

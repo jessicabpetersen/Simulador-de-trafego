@@ -24,35 +24,20 @@ public class RodDireitaMonitor extends Rodovia{
     }
 
     @Override
-    void colocarCarro() throws InterruptedException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    void  colocarCarro() throws InterruptedException {
+        colocarCarroS();
     }
 
     @Override
     void retirarCarro() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        retirarCarroS();
     }
-
-//    @Override
-//    boolean isDireita() {
-//        return true;
-//    }
-//
-//    @Override
-//    boolean isEsquerda() {
-//        return false;
-//    }
-//
-//    @Override
-//    boolean isBaixo() {
-//        return false;
-//    }
-//
-//    @Override
-//    boolean isCima() {
-//        return false;
-//    }
-
-   
+    public synchronized void  colocarCarroS(){
+        setImagem(new ImageIcon("img/carrodireita.png"));
+    }
+    
+    public synchronized void  retirarCarroS(){
+        setImagem(new ImageIcon("img/rodoviaDireita.png"));
+    }
 
 }

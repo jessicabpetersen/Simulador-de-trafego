@@ -37,7 +37,7 @@ public class Controller implements Observado {
         if (IntervaloInsercao > 0) {
             this.intervaloInsercao = IntervaloInsercao;
         } else {
-            this.intervaloInsercao = 5000;
+            this.intervaloInsercao = 1000;
         }
         //Mecanismo 1: encerrar e aguardar veículos saírem da malha   2: para de inserir e encerra imediatamente todos os veículos   
         this.mecanismo = mecanismo;
@@ -50,14 +50,18 @@ public class Controller implements Observado {
         while (qtddMaximaVeiculo > 0) {
             Carro carro = new Carro(malha, this);
             qtddMaximaVeiculo--;
+            notificarMovimento();
             carro.start();
             try {
                 sleep(intervaloInsercao);
-                notificarMovimento();
             } catch (InterruptedException ex) {
                 Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+    
+    public void veiculoSaiu(){
+        qtddMaximaVeiculo++;
         criarVeiculo();
     }
 

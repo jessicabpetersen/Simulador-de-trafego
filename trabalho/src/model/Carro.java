@@ -20,7 +20,7 @@ public class Carro extends Thread {
 
     private Malha malha;
     private Random rand = new Random();
-    int linha, coluna, direcao;
+    int linha, coluna, direcao, linhaAnterior, colunaAnterior; //direcao 1: direita, 2: esquerda, 3:baixo, 4:cima
     Campo[][] malhaRodoviaria;
     Controller c;
 
@@ -32,9 +32,11 @@ public class Carro extends Thread {
     @Override
     public void run() {
         try {
-            iniciar();
-            sleep(2000);
             c.notificarMovimento();
+            System.out.println("Carro entrou na malha");
+            iniciar();
+            c.notificarMovimento();
+            sleep(2000);
             andar();
         } catch (InterruptedException ex) {
             Logger.getLogger(Carro.class.getName()).log(Level.SEVERE, null, ex);
@@ -46,35 +48,124 @@ public class Carro extends Thread {
         int pontos[][] = malha.getPontosIniciais();
         coluna = pontos[0][iniciar];
         linha = pontos[1][iniciar];
+        colunaAnterior = coluna;
+        linhaAnterior = linha;
         malhaRodoviaria = malha.getMalhaRodoviaria();
         malhaRodoviaria[coluna][linha].colocarCarro();
 
     }
 
     private void andar() throws InterruptedException {
-        while (linha < malha.getLinhasTotais() || coluna < malha.getColunasTotais()) {
-            if (malhaRodoviaria[coluna][linha].getClass() == RodBaixoSemaforo.class) {
+        while (!malhaRodoviaria[coluna][linha].isPontoFinal()) {
+            if (malhaRodoviaria[coluna][linha].getClass() == RodBaixoSemaforo.class || malhaRodoviaria[coluna][linha].getClass() == RodBaixoMonitor.class) {
                 malhaRodoviaria[coluna][(linha + 1)].colocarCarro();
                 malhaRodoviaria[coluna][linha].retirarCarro();
+                linhaAnterior = linha;
+                direcao = 3;
                 linha++;
             } else {
-                if (malhaRodoviaria[coluna][linha].getClass() == RodCimaSemaforo.class) {
+                if (malhaRodoviaria[coluna][linha].getClass() == RodCimaSemaforo.class || malhaRodoviaria[coluna][linha].getClass() == RodCimaMonitor.class) {
                     malhaRodoviaria[coluna][(linha - 1)].colocarCarro();
                     malhaRodoviaria[coluna][linha].retirarCarro();
+                    linhaAnterior = linha;
+                    direcao = 4;
                     linha--;
 
                 } else {
-                    if (malhaRodoviaria[coluna][linha].getClass() == RodDireitaSemaforo.class) {
+                    if (malhaRodoviaria[coluna][linha].getClass() == RodDireitaSemaforo.class || malhaRodoviaria[coluna][linha].getClass() == RodDireitaMonitor.class) {
                         malhaRodoviaria[(coluna + 1)][linha].colocarCarro();
                         malhaRodoviaria[coluna][linha].retirarCarro();
+                        colunaAnterior = coluna;
+                        direcao = 1;
                         coluna++;
                     } else {
-                        if (malhaRodoviaria[coluna][linha].getClass() == RodEsquerdaSemaforo.class) {
+                        if (malhaRodoviaria[coluna][linha].getClass() == RodEsquerdaSemaforo.class || malhaRodoviaria[coluna][linha].getClass() == RodEsquerdaMonitor.class) {
                             malhaRodoviaria[(coluna - 1)][linha].colocarCarro();
                             malhaRodoviaria[coluna][linha].retirarCarro();
+                            colunaAnterior = coluna;
+                            direcao = 2;
                             coluna--;
                         } else {//cruzamento
+                            int qntdSaidasPossiveis = 0;
+                            int[] direcoes;
+                            int sorteado, contador = 0;
+                            if (direcao == 1) {//direita
+                                qntdSaidasPossiveis += verificarSaidas((coluna + 1), linha, 1);//continuar direita
+                                qntdSaidasPossiveis += verificarSaidas(coluna, (linha + 1), 3);//baixo
+                                qntdSaidasPossiveis += verificarSaidas(coluna, (linha - 1), 4);//cima
+                                direcoes = new int[qntdSaidasPossiveis];
+                                sorteado = rand.nextInt(qntdSaidasPossiveis);
+                                if (verificarSaidas((coluna + 1), linha, 1) == 1) {
+                                        direcoes[contador] = 1;
+                                        contador++;
+                                    }
+                                    if (verificarSaidas(coluna, (linha + 1), 3) == 1) {
+                                        direcoes[contador] = 3;
+                                        contador++;
+                                    }
+                                    if (verificarSaidas(coluna, (linha - 1), 4) == 1) {
+                                        direcoes[contador] = 4;
+                                    }
 
+                            } else {
+                                if (direcao == 2) {//esquerda
+                                    qntdSaidasPossiveis += verificarSaidas((coluna - 1), linha, 2);//continuar esquerda
+                                    qntdSaidasPossiveis += verificarSaidas(coluna, (linha + 1), 3);//baixo
+                                    qntdSaidasPossiveis += verificarSaidas(coluna, (linha - 1), 4);//cima
+                                    direcoes = new int[qntdSaidasPossiveis];
+                                    sorteado = rand.nextInt(qntdSaidasPossiveis);
+                                    if (verificarSaidas((coluna - 1), linha, 2) == 1) {
+                                        direcoes[contador] = 2;
+                                        contador++;
+                                    }
+                                    if (verificarSaidas(coluna, (linha + 1), 3) == 1) {
+                                        direcoes[contador] = 3;
+                                        contador++;
+                                    }
+                                    if (verificarSaidas(coluna, (linha - 1), 4) == 1) {
+                                        direcoes[contador] = 4;
+                                    }
+                                } else {
+                                    if (direcao == 3) {//baixo
+                                        qntdSaidasPossiveis += verificarSaidas((coluna - 1), linha, 2);//ir p esquerda
+                                        qntdSaidasPossiveis += verificarSaidas((coluna + 1), linha, 1);//ir p direita
+                                        qntdSaidasPossiveis += verificarSaidas(coluna, (linha + 1), 3);//continuar p baixo
+                                        direcoes = new int[qntdSaidasPossiveis];
+                                        sorteado = rand.nextInt(qntdSaidasPossiveis);
+
+                                        if (verificarSaidas((coluna - 1), linha, 2) == 1) {
+                                            direcoes[contador] = 2;
+                                            contador++;
+                                        }
+                                        if (verificarSaidas((coluna + 1), linha, 1) == 1) {
+                                            direcoes[contador] = 1;
+                                            contador++;
+                                        }
+                                        if (verificarSaidas(coluna, (linha + 1), 3) == 1) {
+                                            direcoes[contador] = 3;
+                                        }
+                                    } else {//cima
+                                        qntdSaidasPossiveis += verificarSaidas((coluna - 1), linha, 2);//ir p esquerda
+                                        qntdSaidasPossiveis += verificarSaidas(coluna, (linha - 1), 3);//continuar cima
+                                        qntdSaidasPossiveis += verificarSaidas((coluna + 1), linha, 1);//ir p direita
+                                        direcoes = new int[qntdSaidasPossiveis];
+                                        sorteado = rand.nextInt(qntdSaidasPossiveis);
+
+                                        if (verificarSaidas((coluna - 1), linha, 2) == 1) {
+                                            direcoes[contador] = 2;
+                                            contador++;
+                                        }
+                                        if (verificarSaidas(coluna, (linha - 1), 3) == 1) {
+                                            direcoes[contador] = 3;
+                                            contador++;
+                                        }
+                                        if (verificarSaidas((coluna + 1), linha, 1) == 1) {
+                                            direcoes[contador] = 1;
+                                        }
+                                    }
+                                }
+                            }
+                            sorteado(direcoes[sorteado]);
                         }
                     }
                 }
@@ -82,6 +173,60 @@ public class Carro extends Thread {
             c.notificarMovimento();
             sleep(800);
         }
+        malhaRodoviaria[coluna][linha].retirarCarro();
+        c.veiculoSaiu();
     }
 
+    public int verificarSaidas(int coluna, int linha, int direcao) {
+        if (direcao == 1) {
+            if (malhaRodoviaria[coluna][linha].getClass() == RodDireitaMonitor.class || malhaRodoviaria[coluna][linha].getClass() == RodDireitaSemaforo.class) {
+                return 1;
+            }
+        } else {
+            if (direcao == 2) {
+                if (malhaRodoviaria[coluna][linha].getClass() == RodEsquerdaMonitor.class || malhaRodoviaria[coluna][linha].getClass() == RodEsquerdaSemaforo.class) {
+                    return 1;
+                }
+            } else {
+                if (direcao == 3) {
+                    if (malhaRodoviaria[coluna][linha].getClass() == RodBaixoMonitor.class || malhaRodoviaria[coluna][linha].getClass() == RodBaixoSemaforo.class) {
+                        return 1;
+                    }
+                } else {
+                    if (malhaRodoviaria[coluna][linha].getClass() == RodCimaMonitor.class || malhaRodoviaria[coluna][linha].getClass() == RodCimaSemaforo.class) {
+                        return 1;
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
+    public void sorteado(int sorteado) throws InterruptedException {
+        if (sorteado == 1) { //direita
+            malhaRodoviaria[(coluna + 1)][linha].colocarCarro();
+            malhaRodoviaria[coluna][linha].retirarCarro();
+            colunaAnterior = coluna;
+            coluna++;
+        } else {
+            if (sorteado == 2) {//direita
+                malhaRodoviaria[(coluna - 1)][linha].colocarCarro();
+                malhaRodoviaria[coluna][linha].retirarCarro();
+                colunaAnterior = coluna;
+                coluna--;
+            } else {
+                if (sorteado == 3) {//baixo
+                    malhaRodoviaria[coluna][(linha + 1)].colocarCarro();
+                    malhaRodoviaria[coluna][linha].retirarCarro();
+                    linhaAnterior = linha;
+                    linha++;
+                } else {//cima
+                    malhaRodoviaria[coluna][(linha - 1)].colocarCarro();
+                    malhaRodoviaria[colunaAnterior][linhaAnterior].retirarCarro();
+                    linhaAnterior = linha;
+                    linha--;
+                }
+            }
+        }
+    }
 }
