@@ -32,11 +32,9 @@ public class Carro extends Thread {
     @Override
     public void run() {
         try {
-            c.notificarMovimento();
             System.out.println("Carro entrou na malha");
             iniciar();
-            c.notificarMovimento();
-            sleep(2000);
+            sleep(800);
             andar();
         } catch (InterruptedException ex) {
             Logger.getLogger(Carro.class.getName()).log(Level.SEVERE, null, ex);
@@ -52,7 +50,7 @@ public class Carro extends Thread {
         linhaAnterior = linha;
         malhaRodoviaria = malha.getMalhaRodoviaria();
         malhaRodoviaria[coluna][linha].colocarCarro();
-
+        c.notificarMovimento();
     }
 
     private void andar() throws InterruptedException {
@@ -171,7 +169,7 @@ public class Carro extends Thread {
                 }
             }
             c.notificarMovimento();
-            sleep(800);
+            sleep(500);
         }
         malhaRodoviaria[coluna][linha].retirarCarro();
         c.veiculoSaiu();
@@ -205,19 +203,19 @@ public class Carro extends Thread {
     public void sorteado(int sorteado) throws InterruptedException {
         if (sorteado == 1) { //direita
             malhaRodoviaria[(coluna + 1)][linha].colocarCarro();
-            malhaRodoviaria[coluna][linha].retirarCarro();
+            malhaRodoviaria[colunaAnterior][linhaAnterior].retirarCarro();
             colunaAnterior = coluna;
             coluna++;
         } else {
             if (sorteado == 2) {//direita
                 malhaRodoviaria[(coluna - 1)][linha].colocarCarro();
-                malhaRodoviaria[coluna][linha].retirarCarro();
+                malhaRodoviaria[colunaAnterior][linhaAnterior].retirarCarro();
                 colunaAnterior = coluna;
                 coluna--;
             } else {
                 if (sorteado == 3) {//baixo
                     malhaRodoviaria[coluna][(linha + 1)].colocarCarro();
-                    malhaRodoviaria[coluna][linha].retirarCarro();
+                    malhaRodoviaria[colunaAnterior][linhaAnterior].retirarCarro();
                     linhaAnterior = linha;
                     linha++;
                 } else {//cima
